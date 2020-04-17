@@ -30,23 +30,13 @@ import tensorflow as tf
 import numpy as np
 import scipy.misc
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+# from mpl_toolkits.mplot3d import Axes3D
 import cv2
 import time
 from nets.ColorHandPose3DNetwork import ColorHandPose3DNetwork
 from utils.general import detect_keypoints, trafo_coords, plot_hand, plot_hand_3d
 import io
 
-def get_img_from_fig(fig, dpi=180):
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=dpi)
-    buf.seek(0)
-    img_arr = np.frombuffer(buf.getvalue(), dtype=np.uint8)
-    buf.close()
-    img = cv2.imdecode(img_arr, 1)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    return img
 
 if __name__ == '__main__':
     # images to be shown
@@ -79,7 +69,6 @@ if __name__ == '__main__':
         image_raw = frame
         image_raw = scipy.misc.imresize(image_raw, (240, 320))
         image_v = np.expand_dims((image_raw.astype('float') / 255.0) - 0.5, 0)
-        print(image_v.shape)
         hand_scoremap_v, image_crop_v, scale_v, center_v,\
         keypoints_scoremap_v, keypoint_coord3d_v = sess.run([hand_scoremap_tf, image_crop_tf, scale_tf, center_tf,
                                                              keypoints_scoremap_tf, keypoint_coord3d_tf],
@@ -95,8 +84,8 @@ if __name__ == '__main__':
         coord_hw_crop = detect_keypoints(np.squeeze(keypoints_scoremap_v))
         coord_hw = trafo_coords(coord_hw_crop, center_v, scale_v, 256)
 
-       
-        
+        #Uncomment following line to get handkeypoint coordinates in 3d
+        # print(keypoint_coord3d_v)
         cv2.imshow('Output', frame)
         c = cv2.waitKey(1)
         if c == 27:
